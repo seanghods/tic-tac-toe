@@ -1,9 +1,45 @@
-const Player = (sign) => {
+const startChecker = (() => {
+    let hasStarted = false;
+
+    const hasGameStarted = () => hasStarted;
+
+    const start = () => hasStarted = true;
+
+    return {hasGameStarted, start}
+})();
+
+const launch = () => {
+    const player1Name = document.querySelector('#player1-name');
+    const player2Name = document.querySelector('#player2-name');
+    const form = document.querySelector('.modal');
+
+    form.classList.add('hidden');
+    startChecker.start();
+
+    if (player1Name.value.length > 0) {
+        gameController.changePlayerName(1, player1Name.value);
+    }
+    if (player2Name.value.length > 0) {
+        gameController.changePlayerName(2, player2Name.value);
+    }
+
+    gameStart.setMessage(`It is the turn of ${player1Name.value}`);
+}
+
+
+const Player = (name, sign) => {
+    this.name = name;
     this.sign = sign;
 
-    const getSign = () => sign;
+    const changeName = (newName) => {
+        name = newName;
+    }
 
-    return { getSign };
+    const getSign = () => sign;
+    
+    const getName = () => name;
+
+    return { getSign, getName, changeName };
 }
 
 const gameBoard = (() => {
@@ -28,7 +64,7 @@ const gameStart = (() => {
 
     cells.forEach(each => {
         each.addEventListener('click',(event) => {
-            if (event.target.innerHTML == '' && gameController.getIsOver() == false) {
+            if (event.target.innerHTML == '' && !gameController.getIsOver() && startChecker.hasGameStarted()) {
                 gameController.playRound(parseInt(event.target.id));
                 updateBoard();
             }
@@ -39,7 +75,6 @@ const gameStart = (() => {
         gameBoard.resetFields();
         gameController.reset();
         updateBoard();
-        messageElement.innerHTML = 'It is the turn of X';
     })
 
     const updateBoard = () => {
@@ -56,8 +91,8 @@ const gameStart = (() => {
 })();
 
 const gameController = (() => {
-    const playerX = Player("X");
-    const playerO = Player("O");
+    const playerX = Player('Player X', "X");
+    const playerO = Player('Player O', "O");
     let round = 1;
     let isOver = false;
 
@@ -65,7 +100,7 @@ const gameController = (() => {
         gameBoard.setField(chosenIndex, getPlayerSign());
         if (checkWinner(chosenIndex)) {
             isOver = true;
-            gameStart.setMessage(`${getPlayerSign()} has won!`);
+            gameStart.setMessage(`${getPlayerName()} has won!`);
             return;
         }
         round++;
@@ -74,7 +109,15 @@ const gameController = (() => {
             isOver = true;
             return;
         }
-        gameStart.setMessage(`It is the turn of ${getPlayerSign()}`);
+        gameStart.setMessage(`It is the turn of ${getPlayerName()}`);
+    }
+
+    const changePlayerName = (player, name) => {
+        player == 1 ? playerX.changeName(name) : playerO.changeName(name);;
+    }
+
+    const getPlayerName = () => {
+        return round % 2 == 1 ? playerX.getName() : playerO.getName();
     }
 
     const getPlayerSign = () => {
@@ -84,6 +127,7 @@ const gameController = (() => {
     const reset = () => {
         round = 1;
         isOver = false;
+        gameStart.setMessage(`It is the turn of ${getPlayerName()}`);
     }
 
     const checkWinner = (chosenIndex) => {
@@ -112,5 +156,5 @@ const gameController = (() => {
         return isOver;
     }
 
-    return { playRound, reset, getIsOver}
+    return { playRound, reset, getIsOver, changePlayerName}
 })();
