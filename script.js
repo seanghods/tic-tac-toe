@@ -50,7 +50,6 @@ const gameStart = (() => {
 
     const setMessage = (msg) => {
         messageElement.innerHTML = msg;
-        console.log(msg);
     }
 
     return { setMessage }
