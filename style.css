@@ -31,10 +31,6 @@ body {
     display: flex;
 }
 
-.spaceholder {
-    width: 350px;
-}
-
 /* Gameboard */
 
 .gameboard {
@@ -46,10 +42,12 @@ body {
 }
 
 .cell {
-    text-align: center;
-    height: 150px;
-    width: 220px;
-    font-size: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 18vh;
+    width: 15vw;
+    font-size: 5em;
 }
 
 .cell:hover {
